@@ -1,4 +1,4 @@
-from logic import validar_rut, generar_rut_valido
+from logic import validar_rut, generar_rut_valido, formatear_rut
 
 def menu():
     print("\n--- HERRAMIENTAS DE RUT CHILE ---")
@@ -11,13 +11,13 @@ def menu():
     if opcion == "1":
         rut = input("Ingresa el RUT (ej: 12.345.678-9): ")
         if validar_rut(rut):
-            print(f"✅ El RUT {rut} es VÁLIDO.")
+            print(f"✅ El RUT {formatear_rut(rut)} es VÁLIDO.")
         else:
             print(f"❌ El RUT {rut} es INVÁLIDO.")
             
     elif opcion == "2":
         nuevo_rut = generar_rut_valido()
-        print(f"✨ RUT Generado: {nuevo_rut}")
+        print(f"✨ RUT Generado: {formatear_rut(nuevo_rut)}")
         
     elif opcion == "3":
         print("¡Adiós!")

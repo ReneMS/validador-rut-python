@@ -1,11 +1,28 @@
 import random
 
-def validar_rut(rut_completo):
+def calcular_dv(cuerpo: str) -> str:
+    """Calcula el dígito verificador para un cuerpo de RUT dado."""
+    reverso = map(int, reversed(cuerpo))
+    factores = [2, 3, 4, 5, 6, 7]
+    suma = 0
+    
+    for i, d in enumerate(reverso):
+        suma += d * factores[i % 6]
+        
+    res = 11 - (suma % 11)
+    
+    if res == 11:
+        return "0"
+    elif res == 10:
+        return "K"
+    return str(res)
+
+def validar_rut(rut_completo: str) -> bool:
     # Limpiar el RUT
     rut_limpio = rut_completo.replace(".", "").replace("-", "").upper()
     
     # Validación básica
-    if len(rut_limpio) < 8:
+    if len(rut_limpio) < 2:
         return False
         
     cuerpo = rut_limpio[:-1]
@@ -14,43 +31,27 @@ def validar_rut(rut_completo):
     if not cuerpo.isdigit():
         return False
 
-    # Calcular DV (Módulo 11)
-    reverso = map(int, reversed(cuerpo))
-    factores = [2, 3, 4, 5, 6, 7]
-    suma = 0
-    
-    for i, d in enumerate(reverso):
-        suma += d * factores[i % 6]
-        
-    dv_esperado = 11 - (suma % 11)
-    
-    if dv_esperado == 11:
-        dv_real = "0"
-    elif dv_esperado == 10:
-        dv_real = "K"
-    else:
-        dv_real = str(dv_esperado)
+    return calcular_dv(cuerpo) == dv_ingresado
 
-    return dv_real == dv_ingresado
-
-def generar_rut_valido():
-    # Generar un cuerpo aleatorio
+def generar_rut_valido() -> str:
+    # Generar un rut aleatorio
     cuerpo = str(random.randint(5000000, 25000000))
-    
-    # Calcular su DV
-    reverso = map(int, reversed(cuerpo))
-    factores = [2, 3, 4, 5, 6, 7]
-    suma = 0
-    for i, d in enumerate(reverso):
-        suma += d * factores[i % 6]
-    
-    res = 11 - (suma % 11)
-    
-    if res == 11:
-        dv = "0"
-    elif res == 10:
-        dv = "K"
-    else:
-        dv = str(res)
-    
+    dv = calcular_dv(cuerpo)
     return f"{cuerpo}-{dv}"
+
+def formatear_rut(rut_raw: str) -> str:
+    """Formatea un RUT string (ej: 123456789 -> 12.345.678-9)."""
+    rut_limpio = rut_raw.replace(".", "").replace("-", "").upper()
+    
+    if len(rut_limpio) < 2:
+        return rut_raw
+        
+    cuerpo = rut_limpio[:-1]
+    dv = rut_limpio[-1]
+    
+    if not cuerpo.isdigit():
+        return rut_raw
+        
+    # Formatear con puntos de miles
+    cuerpo_fmt = "{:,}".format(int(cuerpo)).replace(",", ".")
+    return f"{cuerpo_fmt}-{dv}"
